@@ -37,7 +37,7 @@ def patched_init(self, path, frame_rate, bit_rate=1000000):
     self.stream.bit_rate = bit_rate
 
 
-# Aplica el parche a la clase VideoWriter
+#Aplica el parche a la clase VideoWriter
 VideoWriter.__init__ = patched_init
 print("parcheada")
 
