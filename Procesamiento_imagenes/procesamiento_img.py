@@ -9,7 +9,7 @@ import zipfile
 from google.colab.patches import cv2_imshow  #solo para colab
 from google.colab import drive   #solo para colab
 
-"""Convertir imagenes"""
+#"""Procesamiento de las imagenes"""
 
 ##conectar a drive // solo en colab
 drive.mount('/content/drive')
