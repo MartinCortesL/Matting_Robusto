@@ -1,32 +1,34 @@
 # Se corrigieron errores de compatibilidad del matting robusto con GoogleColab actual
 ###"""Modelo del github"""
-
-#Clonar el github al entorno de colab
-!git clone https://github.com/PeterL1n/RobustVideoMatting.git
-!cd RobustVideoMatting
-
-!pip install -r RobustVideoMatting/requirements_inference.txt  #instalar el requirements_inference.txt
-
+'''
+#Clonar el github al entorno de colab/en la terminal
+git clone https://github.com/PeterL1n/RobustVideoMatting.git
+cd RobustVideoMatting
+'''
+'''Usaren la terminal
+pip install -r RobustVideoMatting/requirements_inference.txt  #instalar el requirements_inference.txt
+'''
+''' usar en la terminal
 #obtiene los pesos del modelo
-!wget https://github.com/PeterL1n/RobustVideoMatting/releases/download/v1.0.0/rvm_mobilenetv3.pth
-
+wget https://github.com/PeterL1n/RobustVideoMatting/releases/download/v1.0.0/rvm_mobilenetv3.pth
+'''
 
 # cargar el modelo.
 from RobustVideoMatting.model import MattingNetwork
 
 model = MattingNetwork('mobilenetv3')  # or "resnet50"
 model.load_state_dict(torch.load('rvm_mobilenetv3.pth')) #poner los pesos en el modelo
-
-!pip install av tqdm pims  #instalar el av
-
+''' usar en la terminal
+pip install av tqdm pims  #instalar el av
+'''
 #Librerias para el modelo
 from torch.utils.data import DataLoader
 from torchvision.transforms import ToTensor
 from RobustVideoMatting.inference_utils import VideoReader, VideoWriter
 from RobustVideoMatting.inference_utils import ImageSequenceReader, ImageSequenceWriter
-
+''' Usar en la terminal
 !gdown https://drive.google.com/uc?id=1I0v72-hNlK1hm9q1OwyaATUYApXpotS6 -O input.mp4  ##video de prueba del creador
-
+'''
 #función para parchear y corregir el error de compatibilidad
 import av
 from fractions import Fraction
