@@ -1,20 +1,22 @@
-# Aprendizaje profundo con memoria temporal para el matting robusto de figuras humanas en entornos aéreos dinámicos"
+# Aprendizaje profundo con memoria temporal para el matting robusto de figuras humanas en entornos aéreos dinámicos
 
-## Artículo
-<div style="text-align: justify;">
+## Introducción
 
-Se leyó el artículo [RVM: Robust High-Resolution Video Matting with Temporal Guidance](https://peterl1n.github.io/RobustVideoMatting/#/) para entender el matting, donde el modelo  reemplaza el fondo en tiempo real con un fondo verde y utiliza la información temporal para ver las características de cada frame anterior y actual. Además, no necesita trimaps ni imágenes de fondo previamente obtenidas, ya que utiliza una arquitectura recurrente para analizar la información temporal de frames anteriores. Utiliza el modelo MobileNet V3-Large y Resnet-50. Su modelo tiene 3 bloques: el bottleneck, el upsampling y el output, al igual que usa un módulo de filtrado guiado (DGF). Su entrenamiento se basó en 4 pasos, donde, en cada uno iban ajustando los hiperparametros, las épocas y la cantidad de frames que recibían de los videos.
-Entre sus resultados se encuentra que, su modelo segmenta mejor a los humanos que otros modelos, igualmente funciona mejor con fondos dinámicos que otros y pueden aumentar el tamaño de su modelo para aplicaciones desde un servidor.
-Sus limitaciones son que el modelo es ideal con objetos claros, si hay personas en el fondo empeora el resultado, al igual que si hay fondos complejos.
-</div>
+En el artículo [RVM: Robust High-Resolution Video Matting with Temporal Guidance](https://peterl1n.github.io/RobustVideoMatting/#/)[1] se desarrolló un modelo de inteligencia artificial y visión artificial permite obtener el mating, el cual es el proceso de predecir el alpha matte, de una imagen con personas, donde el modelo remplaza el fondo de la imagen en tiempo real con un color verde.
+Este modelo utiliza información temporal para ver las caracteristicasde cada frame anterior al actual, lo que hace que no necesite trimaps ni imagenes de fondo previamente obtenidas. Esto lo consigue al tener una arquitectura recurrente para analizar la información temporal de frames anteriores. Está basado en mobileNet V3-Large y ResNet-50, donde emplealos siguientes 3 bloques de manera general:
+  - Bloque de BottleNeck: Opera en una escala de caracteristicas de 1/16 despues del modulo de segmentación.
+  - Bloque de UpSampling: Se repite en una escala de 1/8, 1/4 y 1/2 aplicando una convolución recurrente.
+  - Bloque de Output: En este bloque se refinan los resultados obtenidos.
+Usa un modulo de Filtrado Guiado (DGF) donde pasan imagenes de baja calidad a traves de este filtro para producir alta resolución en el video o imagen resultante.
+### Limitaciones
+El modelo prefiere videos con objetos claros. Cuando hay personas en el fondo, los sujetos de interes se vuelven ambiguos. Esto favorece a fondos simples para producir mas exactitud en el matting.
+###
+Por lo tanto, lo que se busca implementar en este trabajo es un fine-tuning del modelo RVM con e fin de especializarlo en imagenes que contienen vistas aereas obtenidas de un dron.
 
-## Procesamiento de las Imágenes
-<div style="text-align: justify;">
+## Dataset
+El objeto que se busca segmentar para este trabajo son las personas, por lo tanto, en las imágenes ubicadas en: [DronSafe-Landing: A Semi-Supervised Dataset for Urban Aerial Semantic Segmentation](https://zenodo.org/records/17614252?preview=1&token=eyJhbGciOiJIUzUxMiJ9.eyJpZCI6IjVhYzRjOWE4LWFhZjctNDI4Mi1iZDJjLWE2N2UzNGI4MTk4MSIsImRhdGEiOnt9LCJyYW5kb20iOiI1Y2M3MmVlM2MwNjQ5NDNkMzYzZmMwMTgyMjlhZDQ4MSJ9.QdRdtjTefigdGW4wZTdTwsvO6ilAz2kqorrEmkeY2Kwo0BeXl6h4lkbUJLYIxqvt7BZRulAhaep5NQUhUTm_sg), se consiguió el código RGB el cual es (255,22,96), con él se segmentó las imagenes con blanco (255,255,255) donde hubiera personas y con negro (0,0,0) el resto de la imagen, haciendo esto para el total de imagenes descargados. El dataset obtenido para este trabajo se encuentra en:
 
-Primero se definió el objeto a segmentar de las imágenes ubicadas en: [DronSafe-Landing: A Semi-Supervised Dataset for Urban Aerial Semantic Segmentation](https://zenodo.org/records/17614252?preview=1&token=eyJhbGciOiJIUzUxMiJ9.eyJpZCI6IjVhYzRjOWE4LWFhZjctNDI4Mi1iZDJjLWE2N2UzNGI4MTk4MSIsImRhdGEiOnt9LCJyYW5kb20iOiI1Y2M3MmVlM2MwNjQ5NDNkMzYzZmMwMTgyMjlhZDQ4MSJ9.QdRdtjTefigdGW4wZTdTwsvO6ilAz2kqorrEmkeY2Kwo0BeXl6h4lkbUJLYIxqvt7BZRulAhaep5NQUhUTm_sg), el cual son las personas. Su código RGB es (255,22,96), con él se segmentó las imagenes con blanco (255,255,255) donde hubiera personas y con negro (0,0,0) el resto de la imagen, haciendo esto para el total de imagenes descargados.
 La función utilizada fue la siguiente:
-</div>
-
 ~~~python
 def transformar_imagen(origen, destino):
   img = cv2.imread(origen) ## lee imagen
@@ -27,8 +29,8 @@ def transformar_imagen(origen, destino):
 ~~~
 Donde, después de obtener la ubicación de las personas en una máscara y pintar dicha ubicación en una imagen negra del mismo tamaño que la original, se almacena el resultado.
 
-## GitHub
-Al momento de probar el modelo que se encuentra en el github del creador ([RobustVideoMatting](https://github.com/PeterL1n/RobustVideoMatting/tree/master?tab=readme-ov-file)) se encontraron algunos problemas a la hora de ejecutar el `convert_video` y el `VideoWriter`, por lo que se siguieron los siguientes pasos para probar el modelo.
+## Modelo de GitHub
+Al momento de probar el modelo que se encuentra en el github del autor ([RobustVideoMatting](https://github.com/PeterL1n/RobustVideoMatting/tree/master?tab=readme-ov-file)) se encontraron algunos problemas a la hora de ejecutar el `convert_video` y el `VideoWriter`, por lo que se siguieron los siguientes pasos para probar el modelo.
 Primero, en el entorno de Google Colab se creó una copia del repositorio de github para llamar directamente desde ahí los métodos.
 Luego, se instalaron los requerimientos de inferencia, se obtuvieron los pesos del modelo y se cargó el modelo MobileNet V3 con dichos pesos a la GPU del entorno.
 Después se importaron las librerías para el `VideoReader` y el `VideoWriter`, y se aplicó un parche al constructor de la clase `VideoWriter` ubicada en `RobustVideoMatting/inference_utils.py`, en cual, es el siguiente:
@@ -52,3 +54,16 @@ print("parche aplicado")
 Finalmente, se ejecutó el código indicado en el repositorio, logrando que el modelo procese correctamente los videos.
 ## Entrenamiento
 -- -- 
+## Referencias
+[1] Lin, S., Yang, L., Saleemi, I., & Sengupta, S. (2021). Robust High-Resolution Video Matting with Temporal Guidance. arXiv preprint arXiv:2108.11515.
+<details>
+<summary><b>Click para ver BibTeX</b></summary>
+@misc{rvm,
+  title={Robust High-Resolution Video Matting with Temporal Guidance}, 
+  author={Shanchuan Lin and Linjie Yang and Imran Saleemi and Soumyadip Sengupta},
+  year={2021},
+  eprint={2108.11515},
+  archivePrefix={arXiv},
+  primaryClass={cs.CV}
+}
+</details>
