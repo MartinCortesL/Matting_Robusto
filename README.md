@@ -2,7 +2,7 @@
 
 ## Introducción
 
-En el artículo [RVM: Robust High-Resolution Video Matting with Temporal Guidance](https://peterl1n.github.io/RobustVideoMatting/#/)[1] se desarrolló un modelo de inteligencia artificial y visión artificial permite obtener el mating, el cual es el proceso de predecir el alpha matte, de una imagen con personas, donde el modelo remplaza el fondo de la imagen en tiempo real con un color verde.
+En el artículo [RVM: Robust High-Resolution Video Matting with Temporal Guidance](https://peterl1n.github.io/RobustVideoMatting/#/) [1] se desarrolló un modelo de inteligencia artificial y visión artificial permite obtener el mating, el cual es el proceso de predecir el alpha matte, de una imagen con personas, donde el modelo remplaza el fondo de la imagen en tiempo real con un color verde.
 Este modelo utiliza información temporal para ver las caracteristicasde cada frame anterior al actual, lo que hace que no necesite trimaps ni imagenes de fondo previamente obtenidas. Esto lo consigue al tener una arquitectura recurrente para analizar la información temporal de frames anteriores. Está basado en mobileNet V3-Large y ResNet-50, donde emplealos siguientes 3 bloques de manera general:
   - Bloque de BottleNeck: Opera en una escala de caracteristicas de 1/16 despues del modulo de segmentación.
   - Bloque de UpSampling: Se repite en una escala de 1/8, 1/4 y 1/2 aplicando una convolución recurrente.
@@ -14,7 +14,7 @@ El modelo prefiere videos con objetos claros. Cuando hay personas en el fondo, l
 Por lo tanto, lo que se busca implementar en este trabajo es un fine-tuning del modelo RVM con e fin de especializarlo en imagenes que contienen vistas aereas obtenidas de un dron.
 
 ## Dataset
-El objeto que se busca segmentar para este trabajo son las personas, por lo tanto, en las imágenes ubicadas en: [DronSafe-Landing: A Semi-Supervised Dataset for Urban Aerial Semantic Segmentation](https://zenodo.org/records/17614252?preview=1&token=eyJhbGciOiJIUzUxMiJ9.eyJpZCI6IjVhYzRjOWE4LWFhZjctNDI4Mi1iZDJjLWE2N2UzNGI4MTk4MSIsImRhdGEiOnt9LCJyYW5kb20iOiI1Y2M3MmVlM2MwNjQ5NDNkMzYzZmMwMTgyMjlhZDQ4MSJ9.QdRdtjTefigdGW4wZTdTwsvO6ilAz2kqorrEmkeY2Kwo0BeXl6h4lkbUJLYIxqvt7BZRulAhaep5NQUhUTm_sg), se consiguió el código RGB el cual es (255,22,96), con él se segmentó las imagenes con blanco (255,255,255) donde hubiera personas y con negro (0,0,0) el resto de la imagen, haciendo esto para el total de imagenes descargados. El dataset obtenido para este trabajo se encuentra en:
+El objeto que se busca segmentar para este trabajo son las personas, por lo tanto, en las imágenes ubicadas en: [DronSafe-Landing: A Semi-Supervised Dataset for Urban Aerial Semantic Segmentation](https://zenodo.org/records/17614252?preview=1&token=eyJhbGciOiJIUzUxMiJ9.eyJpZCI6IjVhYzRjOWE4LWFhZjctNDI4Mi1iZDJjLWE2N2UzNGI4MTk4MSIsImRhdGEiOnt9LCJyYW5kb20iOiI1Y2M3MmVlM2MwNjQ5NDNkMzYzZmMwMTgyMjlhZDQ4MSJ9.QdRdtjTefigdGW4wZTdTwsvO6ilAz2kqorrEmkeY2Kwo0BeXl6h4lkbUJLYIxqvt7BZRulAhaep5NQUhUTm_sg) [2], se consiguió el código RGB el cual es (255,22,96), con él se segmentó las imagenes con blanco (255,255,255) donde hubiera personas y con negro (0,0,0) el resto de la imagen, haciendo esto para el total de imagenes descargados. El dataset obtenido para este trabajo se encuentra en [3]:
 
 La función utilizada fue la siguiente:
 ~~~python
@@ -67,3 +67,6 @@ Finalmente, se ejecutó el código indicado en el repositorio, logrando que el m
   primaryClass={cs.CV}
 }
 </details>
+[2] M. S. Soriano-Garcia, D. Mercado, . israel . becerraand J. De La Torre-Vanegas, “DronSafe-Landing: A Semi-Supervised Dataset for Urban Aerial Semantic Segmentation”. Zenodo, Nov. 15, 2025. doi: 10.5281/zenodo.17614252.
+
+[3] J. M. Cortes Lozano, “Dataset de aprendizaje profundo con memoria temporal para el matting robusto de figuras humanas en entornos aéreos dinámicos”. Zenodo, Apr. 18, 2026. doi: 10.5281/zenodo.19637728.
