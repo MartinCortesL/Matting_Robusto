@@ -68,5 +68,37 @@ Finalmente, se ejecutó el código indicado en el repositorio, logrando que el m
 }
 </details>
 [2] M. S. Soriano-Garcia, D. Mercado, . israel . becerraand J. De La Torre-Vanegas, “DronSafe-Landing: A Semi-Supervised Dataset for Urban Aerial Semantic Segmentation”. Zenodo, Nov. 15, 2025. doi: 10.5281/zenodo.17614252.
-
+<details>
+<summary><b>Click para ver BibTeX</b></summary>
+@misc{soriano_garcia_2025_17614252,
+  author       = {Soriano-Garcia, Miguel S. and
+                  Mercado, Diego and
+                  becerra, israel and
+                  De La Torre-Vanegas, Julio},
+  title        = {DronSafe-Landing: A Semi-Supervised Dataset for
+                   Urban Aerial Semantic Segmentation
+                  },
+  month        = nov,
+  year         = 2025,
+  publisher    = {Zenodo},
+  doi          = {10.5281/zenodo.17614252},
+  url          = {https://doi.org/10.5281/zenodo.17614252},
+}
+</details>
 [3] J. M. Cortes Lozano, “Dataset de aprendizaje profundo con memoria temporal para el matting robusto de figuras humanas en entornos aéreos dinámicos”. Zenodo, Apr. 18, 2026. doi: 10.5281/zenodo.19637728.
+<details>
+<summary><b>Click para ver BibTeX</b></summary>
+@dataset{cortes_lozano_2026_19637728,
+  author       = {Cortes Lozano, Jose Martin},
+  title        = {Dataset de aprendizaje profundo con memoria
+                   temporal para el matting robusto de figuras
+                   humanas en entornos aéreos dinámicos
+                  },
+  month        = apr,
+  year         = 2026,
+  publisher    = {Zenodo},
+  version      = {Version 1.0},
+  doi          = {10.5281/zenodo.19637728},
+  url          = {https://doi.org/10.5281/zenodo.19637728},
+}
+</details>
