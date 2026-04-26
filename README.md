@@ -53,6 +53,9 @@ print("parche aplicado")
 ~~~
 Finalmente, se ejecutó el código indicado en el repositorio, logrando que el modelo procese correctamente los videos.
 ## Entrenamiento
+Debido a que el modelo fue creado especificamente para videos y a limitaciones en el codigo de `train.py`, se creo una clase para procesar la imagen original junto a su mascara binaria.
+Para calcular el rendimiento del modelo, se utilizó la función `MattingLoss` que fue hecha por los autores del trabajo, adémas se calcularon diferentes metricas como el BCELoss, la unión sobre la intercección (IoU) y el coeficiente DICE.
+La validación se realiza antes de empezar cada ciclo de entrenamiento y muestra una comparación entre la imagen real, la mascara de esa imagen y la imagen obtenida por el modelo. El entrenamiendo realiza un fine-tuning sobre la capa de `Decoder` y `project_mat` del modelo donde lo hiperparametros que recibe son el learning rate y el batch size, al igual que la cantidad de epocas. Al finalizar cada entrenamiento se muestra la perdida obtenida por el `Matting Loss` y el BCELoss, y las metricas de IoU junto con el coeficiente DICE.
 -- -- 
 ## Referencias
 [1] Lin, S., Yang, L., Saleemi, I., & Sengupta, S. (2021). Robust High-Resolution Video Matting with Temporal Guidance. arXiv preprint arXiv:2108.11515.
