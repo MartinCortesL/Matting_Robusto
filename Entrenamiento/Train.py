@@ -19,9 +19,6 @@ class SimpleMattingDataset(Dataset):
         self.filenames = [f for f in os.listdir(img_dir) if f.endswith(('.jpg', '.png'))]
         self.img_transform = T.Compose([
             T.Resize(size),
-            #T.RandomHorizontalFlip(),
-            #T.RandomRotation(degrees=(0,90)),
-            #T.RandomPerspective(distortion_scale=0.6, p=1.0),
             T.ToTensor(),
             T.Normalize(
                 mean=[0.485, 0.456, 0.406],
