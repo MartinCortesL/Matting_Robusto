@@ -1,3 +1,4 @@
+# Librerias necesarias
 import torch
 from torch.utils.data import Dataset, DataLoader
 from PIL import Image
@@ -364,3 +365,14 @@ def train_model(
       history['train_dice'], history['val_dice'],
       history['train_Mloss'], history['val_Mloss']
     )
+
+
+'''
+Ejemplo de como llamar la función de entrenamiento
+train_model(Intento=4,
+            Epocas=8,
+            LR=0.000005,
+            BATCH_SIZE=8,
+            CHECKPOINT_PATH='/content/drive/MyDrive/Estancia_Profesional/checkpoint'
+          )
+'''
