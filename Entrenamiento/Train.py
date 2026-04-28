@@ -82,11 +82,9 @@ def validate(model, val_loader, criterion, device):
     val_Bloss = 0
     val_iou = 0
     val_dice = 0
-    i = 0
 
     with torch.no_grad():
         for imgs, masks in tqdm(val_loader, desc="Validación", leave = False):
-            i += 1
             imgs, masks = imgs.to(device), masks.to(device)
 
             # Ajustar a 5D si es necesario
