@@ -53,15 +53,15 @@ print("parche aplicado")
 ~~~
 Finalmente, se ejecutó el código indicado en el repositorio, logrando que el modelo procese correctamente los videos.
 ## Entrenamiento
-Debido a que el modelo fue creado especificamente para videos y a limitaciones en el codigo de `train.py`, se creo una clase para procesar la imagen original junto a su mascara binaria.
+Debido a que el modelo fue creado especificamente para videos y a limitaciones en el codigo de `train.py`, se creó una clase para procesar la imagen original junto a su máscara binaria.
 
-Para calcular el rendimiento del modelo, se utilizó la función `MattingLoss` que fue hecha por los autores del trabajo, adémas se calcularon diferentes metricas como el BCEWithLogitsLoss, la unión sobre la intercección (IoU) y el coeficiente DICE.
+Para calcular el rendimiento del modelo, se utilizó la función `MattingLoss` que fue hecha por los autores del modelo, adémas se calcularon diferentes métricas como el BCEWithLogitsLoss, la unión sobre la intercección (IoU) y el coeficiente DICE.
 
 La validación se realiza antes de empezar cada ciclo de entrenamiento y muestra una comparación entre la imagen real, la mascara de esa imagen y la imagen obtenida por el modelo.
 
 El entrenamiendo realiza un fine-tuning sobre la capa de `Decoder` y `project_mat` del modelo donde lo hiperparametros que recibe son el learning rate y el batch size, al igual que la cantidad de epocas. 
 
-Al finalizar cada entrenamiento se muestra la perdida obtenida por el `Matting Loss` y el BCEWithLogitsLoss, y las metricas de IoU junto con el coeficiente DICE.
+Al finalizar cada entrenamiento se muestra la pérdida obtenida por el `Matting Loss` y el BCEWithLogitsLoss, y las métricas de IoU junto con el coeficiente DICE.
 ## Resultados
 ## Conclusión
 -- -- 
