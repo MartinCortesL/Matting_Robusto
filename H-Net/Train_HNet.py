@@ -93,7 +93,26 @@ print(f"Imágenes: {len(image_paths)}, Máscaras: {len(mask_paths)}")
 print(image_paths[0], "↔", mask_paths[0])
 
 #crear dataset
+def load_data(image_path, mask_path):
+    img = tf.io.read_file(image_path)
+    img = tf.image.decode_png(img, channels=1)
+    img = tf.cast(img, tf.float32) / 255.0
+    img = tf.image.resize(img, [256, 256])
 
+    mask = tf.io.read_file(mask_path)
+    mask = tf.image.decode_png(mask, channels=1)
+    mask = tf.cast(mask, tf.float32) / 255.0
+    mask = tf.image.resize(mask, [256, 256])
+    mask = tf.round(mask)
+
+    return img, mask
+
+#entrenamiento
+dataset = tf.data.Dataset.from_tensor_slices((image_paths, mask_paths))
+dataset = dataset.map(load_data).batch(BS).prefetch(tf.data.AUTOTUNE)
+#validación
+val_dataset = tf.data.Dataset.from_tensor_slices((image_val, mask_val))
+val_dataset = val_dataset.map(load_data).batch(BS).prefetch(tf.data.AUTOTUNE)
 
 #obtener el tiempo restante
 class TiempoRestante(tf.keras.callbacks.Callback):
