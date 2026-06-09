@@ -66,3 +66,20 @@ for file in zip:
       origin = os.path.join(origen, i)
       destiny = os.path.join(destino, i)
       transformar_imagen(origin, destiny)
+
+
+# Convertir las imagenes de png a jpg
+import os
+
+def fix_extensions(directory):
+    count = 0
+    for filename in os.listdir(directory):
+        if filename.endswith(".png"):
+            base = os.path.splitext(filename)[0]
+            os.rename(os.path.join(directory, filename), os.path.join(directory, base + ".jpg"))
+            count += 1
+    print(f"✅ Se cambiaron {count} archivos de .png a .jpg en: {directory}")
+
+# Aplicar a las carpetas de entrenamiento y validación
+fix_extensions('/content/dataset/train/pha')
+fix_extensions('/content/dataset/val/pha')
