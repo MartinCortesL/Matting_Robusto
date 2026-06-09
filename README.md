@@ -2,16 +2,7 @@
 
 ## Introducción
 
-En el artículo [RVM: Robust High-Resolution Video Matting with Temporal Guidance](https://peterl1n.github.io/RobustVideoMatting/#/) [1] se desarrolló un modelo de inteligencia artificial y visión artificial permite obtener el mating, el cual es el proceso de predecir el alpha matte, de una imagen con personas, donde el modelo remplaza el fondo de la imagen en tiempo real con un color verde.
-Este modelo utiliza información temporal para ver las caracteristicasde cada frame anterior al actual, lo que hace que no necesite trimaps ni imagenes de fondo previamente obtenidas. Esto lo consigue al tener una arquitectura recurrente para analizar la información temporal de frames anteriores. Está basado en mobileNet V3-Large y ResNet-50, donde emplealos siguientes 3 bloques de manera general:
-  - Bloque de BottleNeck: Opera en una escala de caracteristicas de 1/16 despues del modulo de segmentación.
-  - Bloque de UpSampling: Se repite en una escala de 1/8, 1/4 y 1/2 aplicando una convolución recurrente.
-  - Bloque de Output: En este bloque se refinan los resultados obtenidos.
-Usa un modulo de Filtrado Guiado (DGF) donde pasan imagenes de baja calidad a traves de este filtro para producir alta resolución en el video o imagen resultante.
-### Limitaciones
-El modelo prefiere videos con objetos claros. Cuando hay personas en el fondo, los sujetos de interes se vuelven ambiguos. Esto favorece a fondos simples para producir mas exactitud en el matting.
-###
-Por lo tanto, lo que se busca implementar en este trabajo es un fine-tuning del modelo RVM con e fin de especializarlo en imagenes que contienen vistas aereas obtenidas de un dron.
+En el presente repositorio se encuentra los codigos utilizados para el entrenamiento de los arquitecturas de visión artificial, espeficicamente Robust Video Matting (RVM) y H-Net, que se presentan a continuación.
 
 ## Dataset
 El objeto que se busca segmentar para este trabajo son las personas, por lo tanto, en las imágenes ubicadas en: [DronSafe-Landing: A Semi-Supervised Dataset for Urban Aerial Semantic Segmentation](https://zenodo.org/records/17614252?preview=1&token=eyJhbGciOiJIUzUxMiJ9.eyJpZCI6IjVhYzRjOWE4LWFhZjctNDI4Mi1iZDJjLWE2N2UzNGI4MTk4MSIsImRhdGEiOnt9LCJyYW5kb20iOiI1Y2M3MmVlM2MwNjQ5NDNkMzYzZmMwMTgyMjlhZDQ4MSJ9.QdRdtjTefigdGW4wZTdTwsvO6ilAz2kqorrEmkeY2Kwo0BeXl6h4lkbUJLYIxqvt7BZRulAhaep5NQUhUTm_sg) [2], se consiguió el código RGB el cual es (255,22,96), con él se segmentó las imagenes con blanco (255,255,255) donde hubiera personas y con negro (0,0,0) el resto de la imagen, haciendo esto para el total de imagenes descargados. El dataset obtenido para este trabajo se encuentra en [3]:
@@ -29,7 +20,7 @@ def transformar_imagen(origen, destino):
 ~~~
 Donde, después de obtener la ubicación de las personas en una máscara y pintar dicha ubicación en una imagen negra del mismo tamaño que la original, se almacena el resultado.
 
-## Modelo de GitHub
+## Modelo de GitHub RVM
 Al momento de probar el modelo que se encuentra en el github del autor ([RobustVideoMatting](https://github.com/PeterL1n/RobustVideoMatting/tree/master?tab=readme-ov-file)) se encontraron algunos problemas a la hora de ejecutar el `convert_video` y el `VideoWriter`, por lo que se siguieron los siguientes pasos para probar el modelo.
 Primero, en el entorno de Google Colab se creó una copia del repositorio de github para llamar directamente desde ahí los métodos.
 Luego, se instalaron los requerimientos de inferencia, se obtuvieron los pesos del modelo y se cargó el modelo MobileNet V3 con dichos pesos a la GPU del entorno.
@@ -52,18 +43,37 @@ VideoWriter.__init__ = patched_init
 print("parche aplicado")
 ~~~
 Finalmente, se ejecutó el código indicado en el repositorio, logrando que el modelo procese correctamente los videos.
-## Entrenamiento
-Debido a que el modelo fue creado especificamente para videos y a limitaciones en el codigo de `train.py`, se creó una clase para procesar la imagen original junto a su máscara binaria.
+## RVM
+### Descripción
+Robust Video Matting (RVM) es un método de matting de video en tiempo real y alta resolución propuesto por [1]. A diferencia de los métodos tradicionales que procesan cada fotograma de forma independiente, RVM utiliza una arquitectura recurrente para explotar la información temporal del video, logrando resultados más coherentes y robustos sin necesidad de entradas auxiliares como trimaps o imágenes de fondo precapturadas.
+### Características principales
+- Tiempo real en alta resolución: procesa video 4K a 76 FPS y HD a 104 FPS en una GPU NVIDIA GTX 1080Ti
+- Arquitectura recurrente: aprovecha la información temporal para mejorar la coherencia entre fotogramas y reducir el parpadeo (flicker)
+- Sin entradas auxiliares: no requiere trimap ni imagen de fondo precapturada
+- Modelo ligero: solo 3.749 millones de parámetros (14.5 MB), frente a los 6.487 M de MODNet o los 60.996 M de DeepLabV3
+- Entrenamiento dual: combina objetivos de matting y segmentación semántica simultáneamente para mejorar la robustez
+### Arquitectura
+El modelo se compone de tres módulos principales:
+- Encoder de extracción de características: basado en MobileNetV3-Large con módulo LR-ASPP, extrae mapas de características a escalas 1/2, 1/4, 1/8 y 1/16​ para cada fotograma individual
+- Decoder recurrente: emplea unidades ConvGRU a múltiples escalas para agregar información temporal. Opera sobre la mitad de los canales mediante división y concatenación, reduciendo el costo computacional sin sacrificar rendimiento
+- Módulo Deep Guided Filter (DGF): permite el muestreo ascendente (upsampling) a alta resolución de forma eficiente y entrenable de extremo a extremo.
 
-Para calcular el rendimiento del modelo, se utilizó la función `MattingLoss` que fue hecha por los autores del modelo, adémas se calcularon diferentes métricas como el BCEWithLogitsLoss, la unión sobre la intercección (IoU) y el coeficiente DICE.
+El codigo utlizado para realizar el entrenamiento con RVM se encuentra [aquí](./RVM)
+## H-Net
+### Descripción
+H-Net es una arquitectura de red neuronal convolucional (CNN) diseñada para recuperar información estructural de imágenes degradadas por medios dispersivos, como niebla, humo o tejido biológico. Propuesta por [4], esta arquitectura ofrece un balance entre precisión y eficiencia computacional, logrando resultados comparables a modelos más complejos como U-Net con una fracción de los recursos necesarios.
+### Características principales
+- Bajo costo computacional: solo 18,999 parámetros entrenables frente a los más de 21 millones de U-Net
+- Eficiencia en memoria: consume 3.3 GB de memoria GPU frente a los 11.5 GB de U-Net
+- Velocidad de inferencia: 4 segundos para 100 imágenes frente a los 11 segundos de U-Net
+- SSIM promedio de 0.8 en reconstrucción de estructuras en medios dispersivos
+- Versatilidad: aplicable a eliminación de neblina, reconstrucción de estructuras vasculares y segmentación semántica
+### Arquitectura
+H-Net se basa en la arquitectura MS-D e incorpora dos tipos de bloques principales:
+- Bloques de convolución dilatada (DCB): capturan características locales y globales de la imagen mediante distintas tasas de dilatación, permitiendo un campo receptivo amplio sin incrementar el número de parámetros
+- Bloques de convolución estándar (CB): refinan las características extraídas por los DCB para mejorar la precisión de la reconstrucción
 
-La validación se realiza antes de empezar cada ciclo de entrenamiento y muestra una comparación entre la imagen real, la mascara de esa imagen y la imagen obtenida por el modelo.
-
-El entrenamiendo realiza un fine-tuning sobre la capa de `Decoder` y `project_mat` del modelo donde lo hiperparametros que recibe son el learning rate y el batch size, al igual que la cantidad de epocas. 
-
-Al finalizar cada entrenamiento se muestra la pérdida obtenida por el `Matting Loss` y el BCEWithLogitsLoss, y las métricas de IoU junto con el coeficiente DICE.
-## Resultados
-## Conclusión
+El codigo utilizado para entrenar el modelo H-Net se encuentra [aquí](./H-net)
 -- -- 
 ## Referencias
 [1] Lin, S., Yang, L., Saleemi, I., & Sengupta, S. (2021). Robust High-Resolution Video Matting with Temporal Guidance. arXiv preprint arXiv:2108.11515.
@@ -111,5 +121,24 @@ Al finalizar cada entrenamiento se muestra la pérdida obtenida por el `Matting 
   version      = {Version 1.0},
   doi          = {10.5281/zenodo.19637728},
   url          = {https://doi.org/10.5281/zenodo.19637728},
+}
+</details>
+
+[4] R. Chiu-Coutino, M. S. Soriano-Garcia, C. I. Medel-Ruiz,  S. M. Afanador-Delgado, E. Villafaña-Rauda, and R. Chiu, 
+"Breaking through scattering: The H-Net CNN model for image retrieval," Computer Methods and Programs in Biomedicine, 
+vol. 265, p. 108723, 2025, doi: 10.1016/j.cmpb.2025.108723.
+<details>
+  <summary><b>Click para ver BibTex</b></summary>
+    @article{chiucoutino2025,
+  author    = {Chiu-Coutino, Roger and Soriano-Garcia, Miguel S. and 
+               Medel-Ruiz, Carlos Israel and Afanador-Delgado, S.M. and 
+               Villafaña-Rauda, Edgar and Chiu, Roger},
+  title     = {Breaking through scattering: The {H-Net} {CNN} model for 
+               image retrieval},
+  journal   = {Computer Methods and Programs in Biomedicine},
+  volume    = {265},
+  pages     = {108723},
+  year      = {2025},
+  doi       = {10.1016/j.cmpb.2025.108723}
 }
 </details>
